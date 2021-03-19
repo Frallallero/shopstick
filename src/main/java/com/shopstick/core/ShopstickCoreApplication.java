@@ -1,4 +1,4 @@
-package com.shopstickcore;
+package com.shopstick.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

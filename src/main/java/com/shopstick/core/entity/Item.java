@@ -1,4 +1,4 @@
-package com.shopstickcore.entity;
+package com.shopstick.core.entity;
 
 import java.math.BigDecimal;
 
@@ -9,11 +9,14 @@ import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
 
 @Entity
 @Table(name="item")
 @NamedQuery(name="Item.findAll", query="SELECT i FROM Item i")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
 @Data
 public class Item {
 	
