@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Data;
 
 @Entity
@@ -33,6 +35,7 @@ public class ShopUser {
 	private String username;
 	private String password;
 	
+	@JsonBackReference
 	@OneToMany(mappedBy = "shopUser", cascade=CascadeType.ALL, orphanRemoval = true)
 	private List<Transaction> orders;
 }

@@ -3,8 +3,10 @@ DROP TABLE IF EXISTS shop_user;
 DROP TABLE IF EXISTS transaction;
 DROP TABLE IF EXISTS item;
 DROP TABLE IF EXISTS cart;
+DROP TABLE IF EXISTS r_cart_item;
 DROP SEQUENCE IF EXISTS shop_user_sq;
 DROP SEQUENCE IF EXISTS transaction_sq;
+DROP SEQUENCE IF EXISTS cart_sq;
 
 CREATE TABLE role (
   id INT AUTO_INCREMENT  PRIMARY KEY,
@@ -38,7 +40,7 @@ CREATE TABLE item (
   id INT AUTO_INCREMENT  PRIMARY KEY,
   name VARCHAR(80) NOT NULL,
   description VARCHAR(250) DEFAULT NULL,
-  item_type ENUM('fork', 'spoon', 'chopstick') NOT NULL,
+  category ENUM('fork', 'spoon', 'chopstick') NOT NULL,
   stock_number INT NOT NULL,
   price NUMERIC NOT NULL,
   image VARCHAR(250) DEFAULT NULL
@@ -47,12 +49,24 @@ CREATE TABLE item (
 CREATE TABLE cart (
   id INT AUTO_INCREMENT  PRIMARY KEY,
   transaction_id INT NOT NULL,
-  item_id INT NOT NULL,
-  quantity INT NOT NULL,
   foreign key (transaction_id) references transaction(id)
 );
 
+CREATE SEQUENCE cart_sq
+  START WITH 1
+  INCREMENT BY 1;
+
+CREATE TABLE r_cart_item (
+  id INT AUTO_INCREMENT  PRIMARY KEY,
+  cart_id INT NOT NULL,
+  item_id INT NOT NULL,
+  quantity INT NOT NULL,
+  foreign key (cart_id) references cart(id),
+  foreign key (item_id) references item(id)
+);
+
 ALTER TABLE cart ADD CONSTRAINT cart_transaction_uq UNIQUE(transaction_id);
+
 
 INSERT INTO role (id, name) VALUES
   (1, 'OWNER'),

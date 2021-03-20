@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ import com.shopstick.core.repo.RoleRepository;
 import com.shopstick.core.repo.ShopUserRepository;
 import com.shopstick.core.repo.TransactionRepository;
 import com.shopstick.core.vo.AddCartItem;
+import com.shopstick.core.vo.ItemVO;
 
 @RestController
 @RequestMapping("/core-rest")
@@ -76,6 +78,13 @@ public class CoreController {
 	}
 	
 //	ITEMS
+	@PostMapping(value = "/items", consumes = MediaType.APPLICATION_JSON_VALUE, 
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public Item createItem(@RequestBody ItemVO item) {
+		logger.info("Creating new item!");
+		return itemRepository.save(new Item(item));
+	}
+	
 	@GetMapping("/items")
 	public List<Item> retrieveItems() {
 		logger.info("Retrieve items");
@@ -86,12 +95,6 @@ public class CoreController {
 	public Item retrieveItemById(@PathVariable Integer id) {
 		logger.info("Retrieve item by id");
 		return itemRepository.getOne(id);
-	}
-	
-	@PostMapping("/items")
-	public Item createItem(@RequestBody Item item) {
-		logger.info("Creating new item!");
-		return itemRepository.save(item);
 	}
 	
 	@PatchMapping("/items/stock-item")
@@ -131,11 +134,19 @@ public class CoreController {
 				transactionRepository.save(transaction);
 				cart.setTransaction(transaction);
 			}
-			cart.setItemId(addCartItem.getItemId());
-			cart.setQuantity(addCartItem.getQuantity());
-//			cartRepository.save(cart);
+			Optional<Item> optionalItem =itemRepository.findById(addCartItem.getItemId());
+			if(optionalItem.isPresent()) {
+				cart.getItems().add(optionalItem.get());
+				cartRepository.save(cart);
+			}
 		}
 		return null;
+	}
+	
+	@GetMapping("/carts")
+	public List<Cart> retrieveCarts() {
+		logger.info("Retrieve carts");
+		return cartRepository.findAll();
 	}
 	
 }

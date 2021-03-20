@@ -14,6 +14,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.Data;
 
 @Entity
@@ -27,6 +30,7 @@ public class Transaction {
     @SequenceGenerator(name = "transaction_sq", sequenceName = "transaction_sq", allocationSize = 1)
 	private Integer id;
 	
+	@JsonManagedReference
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="shop_user_id")
 	private ShopUser shopUser;
@@ -34,6 +38,7 @@ public class Transaction {
 	@Column(name="status_id")
 	private Integer statusId;
 	
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "transaction")
+	@JsonBackReference
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Cart cart;
 }

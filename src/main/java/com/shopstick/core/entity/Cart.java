@@ -1,13 +1,20 @@
 package com.shopstick.core.entity;
 
-import javax.persistence.Column;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -19,17 +26,22 @@ import lombok.Data;
 public class Cart {
 	
 	@Id
-	@GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_sq")
+    @SequenceGenerator(name = "cart_sq", sequenceName = "cart_sq", allocationSize = 1)
 	private Integer id;
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_id")
 	private Transaction transaction;
 	
-    @Column(name = "item_id")
-	private Integer itemId;
-    
-//	@OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//	private List<Item> items;
-	private Integer quantity;
+	@ManyToMany
+	@JoinTable(name = "r_cart_item", joinColumns=@JoinColumn(name = "cart_id"), inverseJoinColumns=@JoinColumn(name="item_id"))
+	private Set<Item> items;
+
+	public Set<Item> getItems() {
+		if(items == null) {
+			items = new HashSet<Item>();
+		}
+		return items;
+	}
 }
