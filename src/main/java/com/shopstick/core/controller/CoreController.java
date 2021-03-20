@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shopstick.core.entity.Cart;
+import com.shopstick.core.entity.CartItem;
 import com.shopstick.core.entity.Item;
 import com.shopstick.core.entity.Role;
 import com.shopstick.core.entity.ShopUser;
 import com.shopstick.core.entity.Transaction;
+import com.shopstick.core.repo.CartItemRepository;
 import com.shopstick.core.repo.CartRepository;
 import com.shopstick.core.repo.ItemRepository;
 import com.shopstick.core.repo.RoleRepository;
@@ -48,6 +50,9 @@ public class CoreController {
 	private CartRepository cartRepository;
 	
 	@Autowired
+	private CartItemRepository cartItemRepository;
+	
+	@Autowired
 	private TransactionRepository transactionRepository;
 
 	
@@ -71,10 +76,19 @@ public class CoreController {
 		return shopUserRepository.findAll();
 	}
 	
-	@GetMapping("/users/{name}")
-	public List<ShopUser> retrieveUserByName(@PathVariable String name) {
-		logger.info("Retrieve user by name");
-		return shopUserRepository.getUserByName(name);
+	@GetMapping("/users/credentials/{username}/{password}")
+	public ShopUser retrieveUserByCredentials(
+			@PathVariable("username") String username,
+			@PathVariable("password") String password) {
+		logger.info("Retrieve user by credentials");
+		return shopUserRepository.findByUsernameAndPassword(username, password);
+	}
+	
+	@GetMapping("/users/{id}/cart-items")
+	public List<Item> retrieveCustomerCart(@PathVariable Integer id) {
+		logger.info("Retrieve customer cart");
+		List<Item> items = cartItemRepository.retrieveCustomerCart(id);
+		return items;
 	}
 	
 //	ITEMS
@@ -121,7 +135,7 @@ public class CoreController {
 		Cart cart;
 		
 		Optional<ShopUser> user = shopUserRepository.findById(addCartItem.getUserId());
-		if(user!=null) {
+		if(user.isPresent()) {
 			cart = cartRepository.findByShopUser(user.get());
 			if(cart==null) {
 				cart = new Cart();
@@ -134,10 +148,21 @@ public class CoreController {
 				transactionRepository.save(transaction);
 				cart.setTransaction(transaction);
 			}
-			Optional<Item> optionalItem =itemRepository.findById(addCartItem.getItemId());
+			Optional<Item> optionalItem = itemRepository.findById(addCartItem.getItemId());
 			if(optionalItem.isPresent()) {
-				cart.getItems().add(optionalItem.get());
-				cartRepository.save(cart);
+				Item item = optionalItem.get();
+				
+//				if the item is already in the cart -> update the quantity
+				CartItem cartItem = cartItemRepository.findByCartAndItem(cart, item);
+				if(cartItem==null) {
+					cartItem = new CartItem();
+					cartItem.setCart(cart);
+					cartItem.setItem(item);
+				}
+				cartItem.setQuantity(addCartItem.getQuantity());
+				cart.getCartItems().add(cartItemRepository.save(cartItem));
+				
+				return cartRepository.save(cart);
 			}
 		}
 		return null;
@@ -146,7 +171,15 @@ public class CoreController {
 	@GetMapping("/carts")
 	public List<Cart> retrieveCarts() {
 		logger.info("Retrieve carts");
-		return cartRepository.findAll();
+		List<Cart> carts = cartRepository.findAll();
+		return carts;
+	}
+	
+	@GetMapping("/carts/{id}/items")
+	public List<Item> retrieveCartItems(@PathVariable Integer id) {
+		logger.info("Retrieve cart items");
+		List<Item> items = cartItemRepository.retrieveItemsByCartId(id);
+		return items;
 	}
 	
 }

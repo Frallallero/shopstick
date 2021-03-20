@@ -3,7 +3,6 @@ package com.shopstick.core.entity;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -39,6 +38,6 @@ public class Transaction {
 	private Integer statusId;
 	
 	@JsonBackReference
-    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
 	private Cart cart;
 }

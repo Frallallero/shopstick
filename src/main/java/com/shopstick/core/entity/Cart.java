@@ -1,7 +1,7 @@
 package com.shopstick.core.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,12 +10,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Data;
 
@@ -30,18 +31,16 @@ public class Cart {
     @SequenceGenerator(name = "cart_sq", sequenceName = "cart_sq", allocationSize = 1)
 	private Integer id;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "transaction_id")
 	private Transaction transaction;
 	
-	@ManyToMany
-	@JoinTable(name = "r_cart_item", joinColumns=@JoinColumn(name = "cart_id"), inverseJoinColumns=@JoinColumn(name="item_id"))
-	private Set<Item> items;
+	@JsonBackReference
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<CartItem> cartItems;
 
-	public Set<Item> getItems() {
-		if(items == null) {
-			items = new HashSet<Item>();
-		}
-		return items;
+	public List<CartItem> getCartItems() {
+		return (cartItems==null) ? new ArrayList<>() : cartItems;
 	}
+	
 }

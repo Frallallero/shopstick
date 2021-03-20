@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS r_cart_item;
 DROP SEQUENCE IF EXISTS shop_user_sq;
 DROP SEQUENCE IF EXISTS transaction_sq;
 DROP SEQUENCE IF EXISTS cart_sq;
+DROP SEQUENCE IF EXISTS r_cart_item_sq;
 
 CREATE TABLE role (
   id INT AUTO_INCREMENT  PRIMARY KEY,
@@ -47,17 +48,13 @@ CREATE TABLE item (
 );
 
 CREATE TABLE cart (
-  id INT AUTO_INCREMENT  PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   transaction_id INT NOT NULL,
   foreign key (transaction_id) references transaction(id)
 );
 
-CREATE SEQUENCE cart_sq
-  START WITH 1
-  INCREMENT BY 1;
-
 CREATE TABLE r_cart_item (
-  id INT AUTO_INCREMENT  PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   cart_id INT NOT NULL,
   item_id INT NOT NULL,
   quantity INT NOT NULL,
@@ -65,13 +62,20 @@ CREATE TABLE r_cart_item (
   foreign key (item_id) references item(id)
 );
 
-ALTER TABLE cart ADD CONSTRAINT cart_transaction_uq UNIQUE(transaction_id);
+CREATE SEQUENCE cart_sq
+  START WITH 1
+  INCREMENT BY 1;
+  
+CREATE SEQUENCE r_cart_item_sq
+  START WITH 1
+  INCREMENT BY 1;
 
+ALTER TABLE cart ADD CONSTRAINT cart_transaction_uq UNIQUE(transaction_id);
 
 INSERT INTO role (id, name) VALUES
   (1, 'OWNER'),
   (2, 'CUSTOMER');
 
 INSERT INTO shop_user VALUES
-   (1, 1, 'Mario', 'Frallallero', 'Password.1'),
-   (2, 2, 'Bianco', 'Bianco', 'Password.2');
+   (1, 1, 'oj', 'oj', '1111'),
+   (2, 2, 'mb', 'mb', '2222');

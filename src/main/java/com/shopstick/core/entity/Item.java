@@ -1,19 +1,14 @@
 package com.shopstick.core.entity;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.shopstick.core.vo.ItemVO;
 
@@ -39,10 +34,6 @@ public class Item {
 	private Integer stockNumber;
 	private BigDecimal price;
 	private String image;
-	
-	@JsonIgnore
-	@ManyToMany(mappedBy = "items", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Cart> carts;
 	
 	public Item() {}
 	
