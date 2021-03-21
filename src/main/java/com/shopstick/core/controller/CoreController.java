@@ -79,9 +79,10 @@ public class CoreController {
 	@GetMapping("/users/credentials/{username}/{password}")
 	public ShopUser retrieveUserByCredentials(
 			@PathVariable("username") String username,
-			@PathVariable("password") String password) {
+			@PathVariable("password") String password) throws Exception {
 		logger.info("Retrieve user by credentials");
-		return shopUserRepository.findByUsernameAndPassword(username, password);
+		ShopUser shopUser = shopUserRepository.findByUsernameAndPassword(username, password);
+		return shopUser;
 	}
 	
 	@GetMapping("/users/{id}/cart-items")

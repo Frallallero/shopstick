@@ -41,7 +41,7 @@ CREATE TABLE item (
   id INT AUTO_INCREMENT  PRIMARY KEY,
   name VARCHAR(80) NOT NULL,
   description VARCHAR(250) DEFAULT NULL,
-  category ENUM('fork', 'spoon', 'chopstick') NOT NULL,
+  category ENUM('FORK', 'SPOON', 'CHOPSTICK') NOT NULL,
   stock_number INT NOT NULL,
   price NUMERIC NOT NULL,
   image VARCHAR(250) DEFAULT NULL
@@ -77,5 +77,5 @@ INSERT INTO role (id, name) VALUES
   (2, 'CUSTOMER');
 
 INSERT INTO shop_user VALUES
-   (1, 1, 'oj', 'oj', '1111'),
-   (2, 2, 'mb', 'mb', '2222');
+   (1, 1, 'Mario', 'sg', '1111'),
+   (2, 2, 'Luigi', 'mb', '2222');
