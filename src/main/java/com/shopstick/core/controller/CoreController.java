@@ -2,11 +2,11 @@ package com.shopstick.core.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +30,7 @@ import com.shopstick.core.repo.ShopUserRepository;
 import com.shopstick.core.repo.TransactionRepository;
 import com.shopstick.core.vo.AddCartItem;
 import com.shopstick.core.vo.ItemVO;
+import com.shopstick.core.vo.UserItemVO;
 
 @RestController
 @RequestMapping("/core-rest")
@@ -86,15 +87,14 @@ public class CoreController {
 	}
 	
 	@GetMapping("/users/{id}/cart-items")
-	public List<Item> retrieveCustomerCart(@PathVariable Integer id) {
+	public List<UserItemVO> retrieveCustomerCart(@PathVariable Integer id) {
 		logger.info("Retrieve customer cart");
-		List<Item> items = cartItemRepository.retrieveCustomerCart(id);
+		List<UserItemVO> items = cartItemRepository.retrieveCustomerCart(id);
 		return items;
 	}
 	
 //	ITEMS
-	@PostMapping(value = "/items", consumes = MediaType.APPLICATION_JSON_VALUE, 
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/items")
 	public Item createItem(@RequestBody ItemVO item) {
 		logger.info("Creating new item!");
 		return itemRepository.save(new Item(item));
@@ -138,35 +138,46 @@ public class CoreController {
 		Optional<ShopUser> user = shopUserRepository.findById(addCartItem.getUserId());
 		if(user.isPresent()) {
 			cart = cartRepository.findByShopUser(user.get());
-			if(cart==null) {
-				cart = new Cart();
-				
-//				if new Cart create a new Order
-				Transaction transaction = new Transaction();
-				transaction.setShopUser(user.get());
-				transaction.setStatusId(1);
-				
-				transactionRepository.save(transaction);
-				cart.setTransaction(transaction);
-			}
 			Optional<Item> optionalItem = itemRepository.findById(addCartItem.getItemId());
 			if(optionalItem.isPresent()) {
 				Item item = optionalItem.get();
-				
-//				if the item is already in the cart -> update the quantity
-				CartItem cartItem = cartItemRepository.findByCartAndItem(cart, item);
-				if(cartItem==null) {
+
+				CartItem cartItem;
+				if(cart!=null) {
+//					if the item is already in the cart -> update the quantity
+					cartItem = cartItemRepository.findByCartAndItem(cart, item);
+					if(cartItem==null) {
+						cartItem = new CartItem();
+						saveCartItem(cartItem, cart, item, addCartItem.getQuantity());
+					} else {
+						cartItem.setQuantity(addCartItem.getQuantity());
+					}
+				} else {
+					cart = new Cart();
 					cartItem = new CartItem();
-					cartItem.setCart(cart);
-					cartItem.setItem(item);
+
+//					if new Cart create a new Order
+					Transaction transaction = new Transaction();
+					transaction.setShopUser(user.get());
+					transaction.setStatusId(1);
+
+					transactionRepository.save(transaction);
+					cart.setTransaction(transaction);
+					saveCartItem(cartItem, cart, item, addCartItem.getQuantity());
 				}
-				cartItem.setQuantity(addCartItem.getQuantity());
-				cart.getCartItems().add(cartItemRepository.save(cartItem));
-				
-				return cartRepository.save(cart);
+				cartRepository.save(cart);
+			} else {
+				// TODO ITEM NOT FOUND
 			}
 		}
 		return null;
+	}
+	
+	private void saveCartItem(CartItem cartItem, Cart cart, Item item, Integer quantity) {
+		cartItem.setCart(cart);
+		cartItem.setItem(item);
+		cartItem.setQuantity(quantity);
+		cart.getCartItems().add(cartItemRepository.save(cartItem));
 	}
 	
 	@GetMapping("/carts")
@@ -183,4 +194,11 @@ public class CoreController {
 		return items;
 	}
 	
+//	TRANSACTION
+	public String purchase() {
+		logger.info("Purchase");
+		UUID corrId = UUID.randomUUID();
+		return corrId.toString();
+		
+	}
 }
