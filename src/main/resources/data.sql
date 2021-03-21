@@ -1,9 +1,9 @@
-DROP TABLE IF EXISTS role;
-DROP TABLE IF EXISTS shop_user;
-DROP TABLE IF EXISTS transaction;
+DROP TABLE IF EXISTS r_cart_item;
 DROP TABLE IF EXISTS item;
 DROP TABLE IF EXISTS cart;
-DROP TABLE IF EXISTS r_cart_item;
+DROP TABLE IF EXISTS transaction;
+DROP TABLE IF EXISTS shop_user;
+DROP TABLE IF EXISTS role;
 DROP SEQUENCE IF EXISTS shop_user_sq;
 DROP SEQUENCE IF EXISTS transaction_sq;
 DROP SEQUENCE IF EXISTS cart_sq;
@@ -79,3 +79,7 @@ INSERT INTO role (id, name) VALUES
 INSERT INTO shop_user VALUES
    (1, 1, 'Mario', 'sg', '1111'),
    (2, 2, 'Luigi', 'mb', '2222');
+   
+INSERT INTO item (name, description, category, stock_number, price) VALUES
+   ('Fork #1', 'A well forged fork', 'FORK', 100, 5),
+   ('Spoon #1', 'A well forged spoon', 'SPOON', 77, 8);

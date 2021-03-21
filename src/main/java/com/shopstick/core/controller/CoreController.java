@@ -30,6 +30,7 @@ import com.shopstick.core.repo.ShopUserRepository;
 import com.shopstick.core.repo.TransactionRepository;
 import com.shopstick.core.vo.AddCartItem;
 import com.shopstick.core.vo.ItemVO;
+import com.shopstick.core.vo.PurchaseVO;
 import com.shopstick.core.vo.UserItemVO;
 
 @RestController
@@ -141,6 +142,12 @@ public class CoreController {
 			Optional<Item> optionalItem = itemRepository.findById(addCartItem.getItemId());
 			if(optionalItem.isPresent()) {
 				Item item = optionalItem.get();
+				
+//				If quantity to add to cart > item availability return
+				if(item.getStockNumber()<addCartItem.getQuantity()) {
+//					TODO manage exception
+					return null;
+				}
 
 				CartItem cartItem;
 				if(cart!=null) {
@@ -195,10 +202,37 @@ public class CoreController {
 	}
 	
 //	TRANSACTION
-	public String purchase() {
+	@PostMapping("/transactions/confirm")
+	public String purchase(@RequestBody PurchaseVO purchase) {
 		logger.info("Purchase");
+
+//		Check creditCard
+		if(!(purchase.getCardNumber().equalsIgnoreCase("1234") &&
+		   purchase.getCvv().equalsIgnoreCase("000"))) {
+			return null;
+		}
+		
+//		Remove quantity from stock
+		Optional<Cart> opCart = cartRepository.findById(purchase.getCartId());
+		if(opCart.isPresent()) {
+			Cart cart = opCart.get();
+			List<CartItem> cartItems = cartItemRepository.findByCart(cart);
+			if(!cartItems.isEmpty()) {
+				for(CartItem cartItem : cartItems) {
+					Item item = cartItem.getItem();
+					item.setStockNumber(item.getStockNumber()-cartItem.getQuantity());
+				}
+			}
+			
+//			Update transaction status
+			Optional<Transaction> opTransaction = transactionRepository.findById(cart.getId());
+			if(opTransaction.isPresent()) {
+				Transaction transaction = opTransaction.get();
+				transaction.setStatusId(2);
+			}
+		}
+		
 		UUID corrId = UUID.randomUUID();
 		return corrId.toString();
-		
 	}
 }

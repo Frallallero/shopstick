@@ -1,7 +1,7 @@
 package com.shopstick.core.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -37,10 +37,10 @@ public class Cart {
 	
 	@JsonBackReference
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<CartItem> cartItems;
+	private List<CartItem> cartItems;
 
-	public Set<CartItem> getCartItems() {
-		return (cartItems==null) ? new HashSet<>() : cartItems;
+	public List<CartItem> getCartItems() {
+		return (cartItems==null) ? new ArrayList<>() : cartItems;
 	}
 	
 }

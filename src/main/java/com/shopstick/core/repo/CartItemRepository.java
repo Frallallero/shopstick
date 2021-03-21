@@ -31,5 +31,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
 			+ " AND s.role=2")
     public List<UserItemVO> retrieveCustomerCart(@Param("customerId") Integer customerId);
 	
+    public List<CartItem> findByCart(Cart cart);
+
     public CartItem findByCartAndItem(Cart cart, Item item);
 }
