@@ -28,12 +28,12 @@ public class CartItem {
 	private Integer id;
 
 	@JsonManagedReference
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	@JoinColumn(name="cart_id")
 	private Cart cart;
 	
 	@JsonManagedReference
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	@JoinColumn(name="item_id")
 	private Item item;
 	private Integer quantity;

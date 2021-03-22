@@ -1,16 +1,18 @@
 package com.shopstick.core.entity;
 
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -27,7 +29,8 @@ import lombok.Data;
 public class Item {
 	
 	@Id
-	@GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_sq")
+    @SequenceGenerator(name = "item_sq", sequenceName = "item_sq", allocationSize = 1)
 	private Integer id;
 	private String name;
 	private String description;
@@ -42,7 +45,7 @@ public class Item {
 	
 	@JsonBackReference
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<CartItem> cartItems;
+	private List<CartItem> cartItems;
 	
 	public Item() {}
 	
