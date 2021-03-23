@@ -47,7 +47,7 @@ public class TransactionController {
 				return null;
 			}
 
-//			Remove quantity from stock
+//			Remove quantity from stock and delete the cart items
 			Optional<Cart> opCart = cartRepository.findById(purchase.getCartId());
 			if(opCart.isPresent()) {
 				Cart cart = opCart.get();
@@ -57,6 +57,8 @@ public class TransactionController {
 						Item item = cartItem.getItem();
 						item.setStockNumber(item.getStockNumber()-cartItem.getQuantity());
 						itemRepository.save(item);
+//						TODO add and manage cart status
+						cartItemRepository.delete(cartItem);
 					}
 				}
 

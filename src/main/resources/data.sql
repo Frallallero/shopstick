@@ -82,8 +82,8 @@ INSERT INTO role (id, name) VALUES
   (2, 'CUSTOMER');
 
 INSERT INTO shop_user VALUES
-   (1, 1, 'Mario', 'sg', '1111'),
-   (2, 2, 'Luigi', 'mb', '2222');
+   (1, 1, 'Admin Name', 'admin', 'admin'),
+   (2, 2, 'User Name', 'user', 'user');
    
 INSERT INTO item (name, description, category, stock_number, price) VALUES
    ('Fork #1', 'A well forged fork', 'FORK', 100, 5),

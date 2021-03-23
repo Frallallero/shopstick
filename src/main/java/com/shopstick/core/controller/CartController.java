@@ -57,6 +57,7 @@ public class CartController {
 				
 //				If quantity to add to cart > item availability return
 				if(item.getStockNumber()<cartItemToAdd.getQuantity()) {
+//					TODO custom exception to manage FE
 					throw new Exception();
 				}
 
