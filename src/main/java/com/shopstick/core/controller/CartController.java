@@ -19,6 +19,8 @@ import com.shopstick.core.entity.CartItem;
 import com.shopstick.core.entity.Item;
 import com.shopstick.core.entity.ShopUser;
 import com.shopstick.core.entity.Transaction;
+import com.shopstick.core.exception.NotAllowedException;
+import com.shopstick.core.exception.NotFoundException;
 import com.shopstick.core.repo.CartItemRepository;
 import com.shopstick.core.repo.CartRepository;
 import com.shopstick.core.repo.ItemRepository;
@@ -44,11 +46,12 @@ public class CartController {
 	
 	@PostMapping("/carts/add-item")
 	public Cart addItemToCart(
-			@RequestBody(required = true) CartItemVO cartItemToAdd) throws Exception {
+			@RequestBody(required = true) CartItemVO cartItemToAdd) throws NotAllowedException, NotFoundException {
+		
 		logger.info("Add items to cart!");
 		Cart cart;
-		
 		Optional<ShopUser> user = shopUserRepository.findById(cartItemToAdd.getUserId());
+		
 		if(user.isPresent()) {
 			cart = cartRepository.findByShopUser(user.get());
 			Optional<Item> optionalItem = itemRepository.findById(cartItemToAdd.getItemId());
@@ -57,39 +60,46 @@ public class CartController {
 				
 //				If quantity to add to cart > item availability return
 				if(item.getStockNumber()<cartItemToAdd.getQuantity()) {
-//					TODO custom exception to manage FE
-					throw new Exception();
+					throw new NotAllowedException();
 				}
-
-				CartItem cartItem;
-				if(cart!=null) {
-//					if the item is already in the cart -> update the quantity
-					cartItem = cartItemRepository.findByCartAndItem(cart, item);
-					if(cartItem==null) {
-						cartItem = new CartItem();
-						saveCartItem(cartItem, cart, item, cartItemToAdd.getQuantity());
-					} else {
-						cartItem.setQuantity(cartItemToAdd.getQuantity());
-					}
-				} else {
-					cart = new Cart();
-					cartItem = new CartItem();
-
-//					if new Cart create a new Order
-					Transaction transaction = new Transaction();
-					transaction.setShopUser(user.get());
-					transaction.setStatusId(1);
-
-					transactionRepository.save(transaction);
-					cart.setTransaction(transaction);
-					saveCartItem(cartItem, cart, item, cartItemToAdd.getQuantity());
-				}
-				cartRepository.save(cart);
+				
+				checkCartItem(cart, item, cartItemToAdd, user.get());
 			} else {
-				// TODO ITEM NOT FOUND
+				throw new NotFoundException();
 			}
 		}
+		
 		return null;
+	}
+	
+	private void checkCartItem(Cart cart, Item item, CartItemVO cartItemToAdd, ShopUser user) {
+		CartItem cartItem;
+		if(cart!=null) {
+//			if the item is already in the cart -> update the quantity
+			cartItem = cartItemRepository.findByCartAndItem(cart, item);
+			if(cartItem==null) {
+				cartItem = new CartItem();
+				saveCartItem(cartItem, cart, item, cartItemToAdd.getQuantity());
+			} else {
+				cartItem.setQuantity(cartItemToAdd.getQuantity());
+			}
+		} else {
+			cart = new Cart();
+			cartItem = new CartItem();
+
+//			if new Cart create a new Order and set to Cart
+			cart.setTransaction(createTransaction(user));
+			saveCartItem(cartItem, cart, item, cartItemToAdd.getQuantity());
+		}
+		cartRepository.save(cart);
+	}
+	
+	private Transaction createTransaction(ShopUser shopUser) {
+		Transaction transaction = new Transaction();
+		transaction.setShopUser(shopUser);
+		transaction.setStatusId(1);//TODO add conf status table
+
+		return transactionRepository.save(transaction);
 	}
 	
 	@Transactional

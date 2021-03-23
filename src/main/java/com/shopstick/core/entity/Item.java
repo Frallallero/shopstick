@@ -1,5 +1,6 @@
 package com.shopstick.core.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -26,7 +27,12 @@ import lombok.Data;
 @NamedQuery(name="Item.findAll", query="SELECT i FROM Item i")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
 @Data
-public class Item {
+public class Item implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6492754356910862451L;
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_sq")

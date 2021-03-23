@@ -53,13 +53,7 @@ public class TransactionController {
 				Cart cart = opCart.get();
 				List<CartItem> cartItems = cartItemRepository.findByCart(cart);
 				if(!cartItems.isEmpty()) {
-					for(CartItem cartItem : cartItems) {
-						Item item = cartItem.getItem();
-						item.setStockNumber(item.getStockNumber()-cartItem.getQuantity());
-						itemRepository.save(item);
-//						TODO add and manage cart status
-						cartItemRepository.delete(cartItem);
-					}
+					updateItemsStock(cartItems);
 				}
 
 //				Update transaction status
@@ -75,5 +69,15 @@ public class TransactionController {
 			response = corrId.toString();
 		}
 		return response;
+	}
+	
+	private void updateItemsStock(List<CartItem> cartItems) {
+		for(CartItem cartItem : cartItems) {
+			Item item = cartItem.getItem();
+			item.setStockNumber(item.getStockNumber()-cartItem.getQuantity());
+			itemRepository.save(item);
+//			TODO add and manage cart status
+			cartItemRepository.delete(cartItem);
+		}
 	}
 }

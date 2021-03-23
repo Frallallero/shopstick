@@ -1,5 +1,6 @@
 package com.shopstick.core.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +26,13 @@ import lombok.Data;
 @Table(name="cart")
 @NamedQuery(name="Cart.findAll", query="SELECT c FROM Cart c")
 @Data
-public class Cart {
+public class Cart implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9077101231948575678L;
+
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_sq")
     @SequenceGenerator(name = "cart_sq", sequenceName = "cart_sq", allocationSize = 1)

@@ -18,10 +18,10 @@ public class UserItemVO {
 		this.cartId = cartItem.getCart().getId();
 		this.item = cartItem.getItem();
 		this.quantity = cartItem.getQuantity();
-		this.totalAmount = calculateAmount(cartItem);
+		this.totalAmount = calculateAmount();
 	}
 	
-	private BigDecimal calculateAmount(CartItem cartItem) {
+	private BigDecimal calculateAmount() {
 		return item.getPrice().multiply(new BigDecimal(quantity));
 	}
 }

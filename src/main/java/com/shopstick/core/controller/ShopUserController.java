@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,12 +36,6 @@ public class ShopUserController {
 		return roleRepository.findAll();
 	}
 	
-	@PostMapping("/users")
-	public ShopUser createUser(@RequestBody ShopUser user) {
-		logger.info("Creating new user!");
-		return shopUserRepository.save(user);
-	}
-	
 	@GetMapping("/users")
 	public List<ShopUser> retrieveUsers() {
 		logger.info("Retrieve users");
@@ -53,7 +45,7 @@ public class ShopUserController {
 	@GetMapping("/users/credentials/{username}/{password}")
 	public ShopUser retrieveUserByCredentials(
 			@PathVariable("username") String username,
-			@PathVariable("password") String password) throws Exception {
+			@PathVariable("password") String password) {
 		logger.info("Retrieve user by credentials");
 		ShopUser shopUser = shopUserRepository.findByUsernameAndPassword(username, password);
 		return shopUser;

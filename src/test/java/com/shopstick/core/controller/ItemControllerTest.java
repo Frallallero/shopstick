@@ -28,7 +28,7 @@ public class ItemControllerTest {
 	void retrieveItems_withNodata_returnEmptyList() {
 		when(itemRepository.findAll()).thenReturn(new ArrayList<Item>());
 		List<Item> response = itemController.retrieveItems();
-		assertThat(response.isEmpty());
+		assertThat(response).isEmpty();
 	}
 	
 	@Test
