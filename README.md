@@ -39,6 +39,12 @@ and then run it with:
 $ java -jar target/shopstick-core-x.x.x.jar
 ```
 
+## Swagger
+
+To access APIs endpoints documentation:
+
+API endpoints: ```http://localhost:8081/swagger-ui.html```
+
 ## Login
 
 To login need to run the web component and connect to:
